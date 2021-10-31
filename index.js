@@ -1,12 +1,10 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
-// const email = require('mongodb').email;
 
 const cors = require('cors');
 require('dotenv').config()
 
-/// heroku server link : https://frozen-refuge-45390.herokuapp.com/
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -15,7 +13,7 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 
-
+//Mongo db connection
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.b67bk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -23,17 +21,17 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect()
-        console.log('database connected');
+        // console.log('database connected');
         const database = client.db('travelmama');
         const servicesCollection = database.collection('services');
         const orderCollection = database.collection('orders');
-        // get Api
+        // get Api Services
         app.get('/services', async (req, res) => {
             const cursor = servicesCollection.find({});
             const services = await cursor.toArray();
             res.send(services);
         });
-        //get single data api
+        //get single service data api
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             console.log('getting specific service', id);
@@ -41,7 +39,7 @@ async function run() {
             const service = await servicesCollection.findOne(query);
             res.json(service);
         })
-        //post api
+        //post api services
         app.post('/services', async (req, res) => {
             const service = req.body;
 
@@ -64,8 +62,8 @@ async function run() {
             const result = await orderCollection.insertOne(req.body);
             res.send(result);
         });
-       
-        // my order
+
+        // my order api
 
         app.get("/myorder/:email", async (req, res) => {
             const result = await orderCollection.find({
@@ -73,7 +71,7 @@ async function run() {
             }).toArray();
             res.send(result);
         });
-         
+
 
         // get all orders api
 
@@ -82,6 +80,9 @@ async function run() {
             const orders = await cursor.toArray();
             res.send(orders);
         });
+
+    
+
         //order delete Api
         app.delete('/allorder/:id', async (req, res) => {
             const id = req.params.id;
