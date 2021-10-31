@@ -1,6 +1,7 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
+// const email = require('mongodb').email;
 
 const cors = require('cors');
 require('dotenv').config()
@@ -25,6 +26,7 @@ async function run() {
         console.log('database connected');
         const database = client.db('travelmama');
         const servicesCollection = database.collection('services');
+        const orderCollection = database.collection('orders');
         // get Api
         app.get('/services', async (req, res) => {
             const cursor = servicesCollection.find({});
@@ -49,11 +51,42 @@ async function run() {
             console.log(result);
             res.json(result)
         });
-        //delete Api
+        //service delete Api 
         app.delete('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await servicesCollection.deleteOne(query);
+            res.json(result)
+        })
+        // Add Order api
+        app.post("/order", async (req, res) => {
+            console.log(req.body);
+            const result = await orderCollection.insertOne(req.body);
+            res.send(result);
+        });
+       
+        // my order
+
+        app.get("/myorder/:email", async (req, res) => {
+            const result = await orderCollection.find({
+                email: req.params.email,
+            }).toArray();
+            res.send(result);
+        });
+         
+
+        // get all orders api
+
+        app.get("/allorder", async (req, res) => {
+            const cursor = orderCollection.find({});
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+        //order delete Api
+        app.delete('/allorder/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
             res.json(result)
         })
 
