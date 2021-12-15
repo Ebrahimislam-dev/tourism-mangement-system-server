@@ -25,6 +25,9 @@ async function run() {
         const database = client.db('travelmama');
         const servicesCollection = database.collection('services');
         const orderCollection = database.collection('orders');
+
+
+
         // get Api Services
         app.get('/services', async (req, res) => {
             const cursor = servicesCollection.find({});
@@ -60,7 +63,10 @@ async function run() {
         app.post("/order", async (req, res) => {
             console.log(req.body);
             const result = await orderCollection.insertOne(req.body);
-            res.send(result);
+            result.displayName = "mrx";
+
+            // console.log(result.);
+            res.send(result2);
         });
 
         // my order api
@@ -81,7 +87,7 @@ async function run() {
             res.send(orders);
         });
 
-    
+
 
         //order delete Api
         app.delete('/allorder/:id', async (req, res) => {
